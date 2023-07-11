@@ -1,5 +1,23 @@
 {
   "dependencies": {
-    "express": "^4.18.2"
+    "cors": "^2.8.5",
+    "create-react-app": "^5.0.1",
+    "creditcard.js": "^3.0.30",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "passport": "^0.6.0",
+    "passport-local": "^1.0.0",
+    "pg": "^8.11.0",
+    "pg-format": "^1.0.4",
+    "swagger-jsdoc": "^6.2.8"
+  },
+  "scripts": {
+    "start": "nodemon server.js --ignore ./view",
+    "client": "cd dolly_store && npm start",
+    "dev": "npm-run-all  --parallel start client"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   }
 }

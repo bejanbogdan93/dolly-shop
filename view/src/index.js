@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { ReactSession } from 'react-client-session';
 //import reportWebVitals from './reportWebVitals';
 
 import Header from './components/header';
@@ -12,15 +13,27 @@ import Register from './components/register';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
+
 export default function Application() {
+
+  const [login, setLogin] = useState(false);
+
+  // ReactSession.setStoreType("cookie");
+  // ReactSession.set("testSession", "hello");
+
+  const confirmLogin = () => {
+    setLogin(true);
+  }
+
+
   return(
     <BrowserRouter>
-      <Header />
+      <Header login={login}/>
       <Routes>
         <Route path='/'>
           <Route index element={<Home />}></Route>
           <Route path='dolls' element={<Dolls/>} />
-          <Route path='login' element={<Login/>} />
+          <Route path='login' element={<Login setLogin={confirmLogin}/>} />
           <Route path='register' element={<Register />} />
         </Route>
         

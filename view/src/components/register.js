@@ -15,6 +15,9 @@ const Register = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault()
+
+
+
         //Call the API for "/login", on POST, with formData as the body:
         const response = await registerUser({
             email,

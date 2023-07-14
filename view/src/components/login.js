@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { loginUser } from '../api/accounts';
 import { Link, useNavigate } from 'react-router-dom';
+import { ReactSession } from 'react-client-session';
 
-const Login = () => {
+const Login = ({setLogin}) => {
 
     const [email, setEmail] = useState();
     const [password, setPassword] = useState();
-    const [login, setLogin] = useState();
+    const [loginMessage, setLoginMessage] = useState();
 
     const navigate = useNavigate();
 
@@ -19,9 +20,16 @@ const Login = () => {
         });
         console.log(response);
         if(response.status == 200){
-            navigate('/', {replace: true});
+            setLogin();
+            // console.log(ReactSession.get("user"));
+            // console.log(document.cookie);
+
+            navigate('/', {
+                replace: true, 
+                // state: ReactSession.get("email") 
+            }); //If using replace: true, the navigation will replace the current entry in the history stack instead of adding a new one.
         } else {
-            setLogin(response.msg);
+            setLoginMessage(response.msg);
         }
         
     }
@@ -46,7 +54,7 @@ const Login = () => {
             <input type="submit" value="Login" />
             <Link to="/register">Register</Link>
         </form>
-            <p>{login ? login : ""}</p>
+            <p>{loginMessage ? loginMessage : ""}</p>
         </div>
     )
 }

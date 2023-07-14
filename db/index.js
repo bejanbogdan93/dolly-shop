@@ -3,6 +3,7 @@ const Pool = require('pg').Pool;
 
 const { isValid } = require('creditcard.js');
 const format = require('pg-format');
+var bcrypt = require('bcryptjs');
 
 const pool = new Pool({
     user: 'postgres',
@@ -45,28 +46,53 @@ const getUserById = (req,res)=> {
     })
 }
 
+const loginUser = (req, res) => {
+    const { email, password } = req.body;
+    getUserByEmail(email, (err, user) => {
+        if (!user) return res.status(403).json({ msg: "User not found!"})
+
+        //Compare hash 
+        const passMatch = bcrypt.compareSync(password, user.password);
+        //If match, store the user in the session
+        if (passMatch){
+            req.session.isAuthenticated = true;
+            req.session.user = {
+            email,
+            password,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            };
+            console.log(res);
+            res.status(200).json({ status: 200, msg: "Succesful"});
+        } else {
+            res.status(403).json({ msg: "Bad Credentials"});
+        }
+    })
+}
+
 const registerUser = async (req, res) => {
     const {email, password, firstName, lastName} = req.body;
-
+    //Generate the next id from users Table
     const result = await pool.query(`SELECT id FROM users ORDER BY id DESC`);
     const nextUserId = result.rows[0].id + 1; 
 
-    pool.query("SELECT * FROM users WHERE email = $1", [email], (error, result) => {
-        if(error) {res.status(400).json({msg: "Could not check database"});};
-        if(result.rows[0]){
-            res.status(409).json({msg: "User email already exists"});
-        } else {
-            pool.query('INSERT INTO users(id, email, password, first_name, last_name) VALUES ($1, $2, $3, $4, $5)',
-            [nextUserId, email, password, firstName, lastName], 
-            (error, results) => {
-                if(error) {res.status(400).json({msg: error.detail});};
-                res.status(201).json({status: 201, msg: "Succesful"});
-            })
-        }
-    })
-
-    
+    //Check is user email alredy exists in the DB
+    const checkingRes = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+    if(checkingRes.rows[0]){
+        res.status(409).json({msg: "User email already exists"});
+    } else {
+        const salt = bcrypt.genSaltSync(10);
+        console.log(salt);
+        const hash = bcrypt.hashSync(password, salt);
+        console.log(hash);
+        const storeuserRes = await pool.query('INSERT INTO users(id, email, password, first_name, last_name) VALUES ($1, $2, $3, $4, $5)',
+        [nextUserId, email, hash, firstName, lastName]);
+        res.status(201).json({status: 201, msg: "Succesful"});
+    }   
 }
+
+
+
 
 const deleteUser = (req, res) => {
     const id = req.params.id;
@@ -293,6 +319,7 @@ module.exports = {
     //----users----
     getUsers,
     getUserById,
+    loginUser,
     registerUser,
     deleteUser,
     getUserByEmail,

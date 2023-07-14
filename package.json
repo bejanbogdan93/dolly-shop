@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "create-react-app": "^5.0.1",
     "creditcard.js": "^3.0.30",

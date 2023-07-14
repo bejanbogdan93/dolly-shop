@@ -3,7 +3,7 @@ import React from "react";
 import {Link} from 'react-router-dom';
 
 
-export default function Header() {
+export default function Header({login}) {
 
     return (
         <div>
@@ -15,8 +15,9 @@ export default function Header() {
                     <Link to='/dolls'>Dolls</Link> 
                 </li>
                 <li className="login">
-                    <Link to='/login'>Login</Link> 
-                    <Link to='/register'>Register</Link> 
+                    {login ? <Link to='/'>Logout</Link> : <Link to='/login'>Login</Link>}
+                     
+                    {/* <Link to='/register'>Register</Link>  */}
                 </li>
             </ul>
             

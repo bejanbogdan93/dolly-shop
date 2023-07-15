@@ -1,3 +1,5 @@
 node_modules
 myREADME.md
 server-swagger.js
+package-lock.json
+view/package-lock.json

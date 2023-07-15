@@ -40,7 +40,7 @@ app.use(express.static(path.join(__dirname, "public")));
 const db = require("./db/index");
 
 const corsOptions = {
-  //@bejanbogdan93 This origin should be changed to the frontend url
+  //@bejanbogdan93 This origin should be changed to the frontend url. You may have to parameterize this somehow when you deploy it.
   origin: "http://localhost:3000", //Your Client, do not write '*'
   credentials: true,
 };
@@ -51,6 +51,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(
   session({
+    //@bejanbogdan93 You could use a .env variable, or maybe look into a secret management service, since most production apps do that.
     secret: "f4z4gs$Gcg", //should be storred securelly in a .env variable
     cookie: { path: "/", httpOnly: true, secure: false, maxAge: null },
     saveUninitialized: true,

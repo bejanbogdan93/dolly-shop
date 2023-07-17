@@ -3,7 +3,9 @@ const Pool = require('pg').Pool;
 
 const { isValid } = require('creditcard.js');
 const format = require('pg-format');
-var bcrypt = require('bcryptjs');
+const bcrypt = require('bcryptjs');
+const jwt = require("jsonwebtoken");
+
 
 const pool = new Pool({
     user: 'postgres',
@@ -48,6 +50,7 @@ const getUserById = (req,res)=> {
 
 const loginUser = (req, res) => {
     const { email, password } = req.body;
+    
     getUserByEmail(email, (err, user) => {
         if (!user) return res.status(403).json({ msg: "User not found!"})
 
@@ -55,15 +58,13 @@ const loginUser = (req, res) => {
         const passMatch = bcrypt.compareSync(password, user.password);
         //If match, store the user in the session
         if (passMatch){
-            req.session.isAuthenticated = true;
-            req.session.user = {
-            email,
-            password,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            };
-            console.log(res);
-            res.status(200).json({ status: 200, msg: "Succesful"});
+            //Generating a JSON Web Token
+            const jwtToken = jwt.sign({
+                id: user.id, email: user.email
+            }, process.env.JWT_SECRET);
+            
+            res.json({status: 200, msg: "Welcome back!", token: jwtToken});
+
         } else {
             res.status(403).json({ msg: "Bad Credentials"});
         }

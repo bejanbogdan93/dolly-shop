@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { loginUser } from '../api/accounts';
 import { Link, useNavigate } from 'react-router-dom';
-import { ReactSession } from 'react-client-session';
+import { useSignIn } from 'react-auth-kit'
 
-const Login = ({setLogin}) => {
+const Login = () => {
 
     const [email, setEmail] = useState();
     const [password, setPassword] = useState();
-    const [loginMessage, setLoginMessage] = useState();
+    const [loginMessage, setLoginMessage] = useState(null);
 
+    const signIn = useSignIn()
     const navigate = useNavigate();
 
     const handleSubmit = async (event) => {
@@ -18,19 +19,24 @@ const Login = ({setLogin}) => {
             email,
             password
         });
-        console.log(response);
-        if(response.status == 200){
-            setLogin();
-            // console.log(ReactSession.get("user"));
-            // console.log(document.cookie);
 
-            navigate('/', {
-                replace: true, 
-                // state: ReactSession.get("email") 
-            }); //If using replace: true, the navigation will replace the current entry in the history stack instead of adding a new one.
-        } else {
+        if(response.status == 200){
+            if(signIn(
+                {
+                    token: response.token,
+                    expiresIn: 3600,
+                    tokenType: "Bearer",
+                    authState: email,
+                })
+            ){
+                navigate('/');
+            }else{
+                setLoginMessage("signIn failed");
+            }
+            
+        }else{
             setLoginMessage(response.msg);
-        }
+        } 
         
     }
 

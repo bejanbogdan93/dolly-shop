@@ -2,18 +2,22 @@
 //https://www.codecademy.com/paths/full-stack-engineer-career-path/tracks/fscp-22-portfolio-project-e-commerce-app-rest-api/modules/fscp-22-e-commerce-app-rest-api/kanban_projects/ecommerce-app-rest-api
 const express = require("express");
 const cors = require("cors");
-const session = require("express-session");
 var path = require("path");
-const store = new session.MemoryStore(); //Note: Storing in-memory sessions is something that should be done only during development, NOT during production due to security risks.
-var passport = require("passport");
-var LocalStrategy = require("passport-local").Strategy;
+
+// var LocalStrategy = require("passport-local").Strategy;
+
 // Passport-local docs: http://www.passportjs.org/howtos/password/
 
 const bodyParser = require("body-parser");
 //body parser Docs: https://expressjs.com/en/resources/middleware/body-parser.html
 const app = express();
-const port = 3001;
+require("dotenv").config();
+
 var swaggerJSDoc = require("swagger-jsdoc");
+
+require("./auth/passport");
+
+
 
 // swagger definition
 var swaggerDefinition = {
@@ -49,46 +53,8 @@ app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(
-  session({
-    //@bejanbogdan93 You could use a .env variable, or maybe look into a secret management service, since most production apps do that.
-    secret: "f4z4gs$Gcg", //should be storred securelly in a .env variable
-    cookie: { path: "/", httpOnly: true, secure: false, maxAge: null },
-    saveUninitialized: true,
-    resave: false,
-    store,
-  })
-);
 
-app.use(passport.initialize());
-app.use(passport.session());
-
-passport.serializeUser((user, done) => {
-  done(null, user.id);
-});
-
-passport.deserializeUser((id, done) => {
-  db.users.findById(id, function (err, user) {
-    if (err) {
-      return done(err);
-    }
-    done(null, user);
-  });
-});
-
-// app.get('/',(req, res) => {
-//   res.redirect("/login");
-// })
-
-app.post(
-  "/login",
-  // passport.authenticate("local", { failureRedirect: "/login" }),
-  db.loginUser
-);
-
-// app.get("/profile", (req, res) => {
-//   res.render("profile", { user: req.session.user });
-// });
+app.post("/login", db.loginUser);
 
 //------------------------------------------------------------- Products "CRUD"
 app.get("/products/", db.getProdByHeigth); //I should check if the body has the heigth, if not, this should return all products
@@ -118,6 +84,11 @@ app.get("/swagger.json", function (req, res) {
   res.send(swaggerSpec);
 });
 
-app.listen(port, () => {
-  console.log(`Listening on post ${port}.`);
+
+
+
+
+
+app.listen(3001, () => {
+  console.log(`Listening on post ${3001}.`);
 });
